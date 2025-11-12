@@ -1,0 +1,125 @@
+// src/lib/paymentMethods.ts
+export const paymentMethods = {
+  paypal: {
+    name: "PayPal",
+    logo: "/images/paypal.png",
+    primaryColor: "#003087",
+    description: "Withdraw funds to your PayPal account.",
+    fields: [{ name: "email", label: "PayPal Email", type: "email" }],
+  },
+  zelle: {
+    name: "Zelle",
+    logo: "/images/zelle.png",
+    primaryColor: "#6c1fd1",
+    description: "Send funds to your Zelle account.",
+    fields: [{ name: "email", label: "Zelle Email", type: "email" }],
+  },
+  cashapp: {
+    name: "Cash App",
+    logo: "/images/cashapp.png",
+    primaryColor: "#00d632",
+    description: "Send funds to your Cash App account.",
+    fields: [{ name: "cashtag", label: "CashTag", type: "text" }],
+  },
+  venmo: {
+    name: "Venmo",
+    logo: "/images/venmo.png",
+    primaryColor: "#3d95ce",
+    description: "Withdraw funds to your Venmo account.",
+    fields: [{ name: "username", label: "Venmo Username", type: "text" }],
+  },
+  westernUnion: {
+    name: "Western Union",
+    logo: "/images/westernunion.png",
+    primaryColor: "#ffcc00",
+    description: "Withdraw funds via Western Union transfer.",
+    fields: [
+      { name: "firstName", label: "First Name", type: "text" },
+      { name: "lastName", label: "Last Name", type: "text" },
+      { name: "country", label: "Country", type: "text" },
+    ],
+  },
+  ach: {
+    name: "ACH Transfer",
+    logo: "/images/ach.png",
+    primaryColor: "#00467f",
+    description: "Withdraw directly to your US bank account (ACH).",
+    fields: [
+      { name: "accountNumber", label: "Account Number", type: "text" },
+      { name: "routingNumber", label: "Routing Number", type: "text" },
+      { name: "accountName", label: "Account Holder Name", type: "text" },
+    ],
+  },
+  sepa: {
+    name: "SEPA Transfer",
+    logo: "/images/sepa.png",
+    primaryColor: "#1a2b6d",
+    description: "Withdraw to your European bank account (SEPA).",
+    fields: [
+      { name: "iban", label: "IBAN", type: "text" },
+      { name: "bic", label: "BIC/SWIFT Code", type: "text" },
+      { name: "accountName", label: "Account Holder Name", type: "text" },
+    ],
+  },
+  skrill: {
+    name: "Skrill",
+    logo: "/images/skrill.png",
+    primaryColor: "#800080",
+    description: "Withdraw funds to your Skrill account.",
+    fields: [{ name: "email", label: "Skrill Email", type: "email" }],
+  },
+  wise: {
+    name: "Wise",
+    logo: "/images/wise.png",
+    primaryColor: "#00b9ff",
+    description: "Withdraw funds via Wise (TransferWise).",
+    fields: [
+      { name: "email", label: "Wise Email", type: "email" },
+      { name: "iban", label: "IBAN / Account Number", type: "text" },
+    ],
+  },
+  payoneer: {
+    name: "Payoneer",
+    logo: "/images/payoneer.png",
+    primaryColor: "#ff4800",
+    description: "Withdraw funds to your Payoneer account.",
+    fields: [{ name: "email", label: "Payoneer Email", type: "email" }],
+  },
+  googlePay: {
+    name: "Google Pay",
+    logo: "/images/googlepay.png",
+    primaryColor: "#4285f4",
+    description: "Withdraw funds to your Google Pay account.",
+    fields: [{ name: "phone", label: "Google Pay Phone Number", type: "tel" }],
+  },
+  applePay: {
+    name: "Apple Pay",
+    logo: "/images/applepay.png",
+    primaryColor: "#000000",
+    description: "Withdraw funds to your Apple Pay account.",
+    fields: [{ name: "appleId", label: "Apple ID Email", type: "email" }],
+  },
+  bitcoin: {
+    name: "Bitcoin",
+    logo: "/images/btc.png",
+    primaryColor: "#f7931a",
+    description: "Withdraw using Bitcoin network.",
+    fields: [{ name: "walletAddress", label: "BTC Wallet Address", type: "text" }],
+  },
+  usdt: {
+    name: "USDT (TRC20)",
+    logo: "/images/usdt.png",
+    primaryColor: "#26a17b",
+    description: "Withdraw USDT on TRC20 network.",
+    fields: [{ name: "walletAddress", label: "USDT Wallet Address", type: "text" }],
+  },
+  ethereum: {
+    name: "Ethereum",
+    logo: "/images/eth.png",
+    primaryColor: "#3c3c3d",
+    description: "Withdraw using Ethereum network.",
+    fields: [{ name: "walletAddress", label: "ETH Wallet Address", type: "text" }],
+  },
+};
+
+export type PaymentMethodKey = keyof typeof paymentMethods;
