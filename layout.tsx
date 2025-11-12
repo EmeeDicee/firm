@@ -1,46 +1,45 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import Sidebar from "@/components/dashboard/Sidebar";
-import Topbar from "@/components/dashboard/Topbar";
-import MobileTabbar from "@/components/dashboard/MobileTabbar";
+import "./globals.css";
+import { Inter } from "next/font/google";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import Providers from "./providers";
+import { usePathname } from "next/navigation";
+import ActivityBot from "@/components/global/ActivityBot";
+import LiveChatWidget from "@/components/LiveChatWidget";
+import { Toaster } from "react-hot-toast"; // ✅ Add this
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { status } = useSession();
-  const router = useRouter();
+const inter = Inter({ subsets: ["latin"] });
 
-  // Protect dashboard routes
-  useEffect(() => {
-    if (status === "unauthenticated") router.replace("/auth/login");
-  }, [status, router]);
-
-  if (status === "loading") {
-    return (
-      <div className="h-screen w-full grid place-items-center bg-gradient-to-br from-[#0b0b0b] to-black text-white">
-        <div className="animate-pulse text-sm opacity-70">Loading your dashboard…</div>
-      </div>
-    );
-  }
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname() || "";
+  const isDashboard = pathname.startsWith("/dashboard");
+  const isAdmin = pathname.startsWith("/admin");
+  const hideNavbar = isDashboard || isAdmin;
+  const showActivityBot = !(isDashboard || isAdmin);
+  const showChatWidget = !(isDashboard || isAdmin);
 
   return (
-    <div className="h-screen w-full bg-[radial-gradient(1200px_800px_at_80%_-10%,rgba(59,130,246,0.20),transparent),radial-gradient(1000px_700px_at_-10%_120%,rgba(168,85,247,0.18),transparent)] text-white">
-      <div className="flex h-full">
-        {/* Desktop sidebar */}
-        <Sidebar className="hidden md:flex" />
-
-        {/* Main column */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <Topbar />
-          <main className="relative flex-1 overflow-y-auto px-4 sm:px-6 lg:px-10 pb-24">
-            {children}
-          </main>
-        </div>
-      </div>
-
-      {/* iOS-style tab bar on mobile */}
-      <MobileTabbar />
-    </div>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preload" href="/brand/logo.svg?v=1" as="image" type="image/svg+xml" />
+        <link rel="icon" href="/brand/logo.svg?v=1" type="image/svg+xml" />
+      </head>
+      <body className={`${inter.className} bg-gray-900 text-white`}>
+        <Providers enableTranslation={!isAdmin}>
+          {!hideNavbar && <Navbar />}
+          <main className="pt-16">{children}</main>
+          {!hideNavbar && <Footer />}
+          {showActivityBot && <ActivityBot />}
+          {showChatWidget && <LiveChatWidget />}
+          <Toaster position="top-center" reverseOrder={false} /> {/* ✅ Toast here */}
+        </Providers>
+      </body>
+    </html>
   );
 }

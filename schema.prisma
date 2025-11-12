@@ -1,0 +1,184 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String               @id @default(cuid())
+  name          String?
+  email         String               @unique
+  password      String
+  createdAt     DateTime             @default(now())
+  image  String?        // ✅ New field for profile picture
+  tokens        PasswordResetToken[]
+  investments   Investment[]
+  notifications NotificationsBell[]
+  withdrawals   Withdrawal[] // ✅ Add this line
+  supportThreads SupportThread[]
+  supportMessages SupportMessage[]
+  walletEntries WalletEntry[]
+
+  // NEW: secret id (generated on registration) and upgrade status
+  secretId      String        @unique @default(uuid())
+  upgradeStatus UpgradeStatus @default(NOT_UPGRADED)
+  upgradeCode   String        @unique
+
+  // Admin-controlled withdraw gates
+  kycVerified          Boolean  @default(false)
+  withdrawPin          String?
+  withdrawPinPlain     String?
+  withdrawAuthCode     String?
+  accountFrozen        Boolean  @default(false)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+enum InvestmentStatus {
+  pending
+  active
+  completed
+  cancelled
+  rejected
+}
+
+model Investment {
+  id            String           @id @default(cuid())
+  userId        String
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan          String
+  amountUSD     Int
+  roiPercent    Int
+  durationDays  Int
+  status        InvestmentStatus @default(pending)
+  paymentMethod String?
+  walletAddress String?
+  txHash        String?
+  proofUrl      String?
+  method        String?
+  createdAt     DateTime         @default(now())
+  activatedAt   DateTime?
+  completedAt   DateTime?
+  updatedAt     DateTime         @updatedAt
+}
+
+model NotificationsBell {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AppSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+// NEW: store withdrawal requests
+model Withdrawal {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  method    String
+  amountUSD Int
+  details   Json
+  status    WithdrawalStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+// Admin-adjusted wallet entries (credits/debits)
+model WalletEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      WalletEntryType
+  amountUSD Int
+  description String
+  createdBy String?
+  createdAt DateTime @default(now())
+}
+
+enum WalletEntryType {
+  CREDIT
+  DEBIT
+}
+
+// Support chat models
+model SupportThread {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  // metadata
+  ip           String?
+  userAgent    String?
+  acceptLang   String?
+  deviceType   String?
+  geoCountry   String?
+  geoCity      String?
+
+  // Read receipts: last read timestamps for user and admin
+  userLastReadAt  DateTime?
+  adminLastReadAt DateTime?
+
+  messages     SupportMessage[]
+}
+
+model SupportMessage {
+  id        String   @id @default(cuid())
+  threadId  String
+  thread    SupportThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderId  String?  // null for system messages
+  sender    User?    @relation(fields: [senderId], references: [id])
+  role      MessageRole
+  text      String?
+  imageUrl  String?
+  translatedText String?
+  srcLang   String?
+  dstLang   String?
+  createdAt DateTime @default(now())
+}
+
+enum MessageRole {
+  USER
+  ADMIN
+  SYSTEM
+}
+
+// NEW: admin-managed upgrade codes that can be redeemed
+model UpgradeCode {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  createdBy String? // admin user id (optional)
+  usedBy    String? // user id when redeemed
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum UpgradeStatus {
+  NOT_UPGRADED
+  UPGRADED
+}
